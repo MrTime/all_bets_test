@@ -15,40 +15,32 @@ class Parser
     @threads = []
   end
 
-  def url
-    "http://www.marathonbet.com/ru/tree-node.htm?nodeId=#{@sport_id}"
-  end
 
-  def get_page
-    open(url)
-  end
-
-  def parse
-    doc = Nokogiri::HTML(get_page)
+  def parse &block
+    doc = Nokogiri::HTML(open(leagures_url))
     doc.css('a').each do |link|
-      @threads << Thread.new(link) do |link|
-        Leagure.parse :href => link['href'], 
-          :name => link.inner_text,
+      start_task(link) do |link|
+        options = {
+          :href => link['href'], 
+          :name => link.inner_text.strip,
           :parser => self
+        }
+        Leagure.parse options, &block
       end
     end
 
-    @threads.each {|t| t.join }
+    wait_for_tasks
   end
 
   def start_task options = {}, &block
-    @threads << Thread.new(options, block)
+    @threads << Thread.new(options, &block)
   end
 
-  def parse_doc_bets(doc)
-    doc.css('.selection-price').each_with_index do |link,i|
-      if i%2 == 0
-        params = /(\d+)@(\w*).(.*)/.match(link['id'])
-        event_id, category, bet = params[1..3]
-        puts "event: #{event_id} category: #{category} bet: #{bet}"
-      end
-    end
+  def wait_for_tasks
+    @threads.each {|t| t.join }
   end
 
-
+  def leagures_url
+    "http://www.marathonbet.com/ru/tree-node.htm?nodeId=#{@sport_id}"
+  end
 end

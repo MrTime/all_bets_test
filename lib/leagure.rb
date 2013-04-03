@@ -1,23 +1,42 @@
-class Leagure
-  def self.parse options
-    @parser, @name, @href, @parser = options[:parser], options[:name], options[:href], options[:parser]
+require './lib/bet'
 
-    url = "http://www.marathonbet.com/#{@href}"
-    doc = Nokogiri::HTML(open(url))
+class Leagure
+  def self.parse options, &block
+    @parser, @name, @href = options[:parser], options[:name], options[:href]
+
+    doc = Nokogiri::HTML(open(bets_url))
+
     doc.css('.event-more-view').each do |link|
       more_view_id = /event-more-view-(\d+)/.match(link['id'])
 
-      more_url = "http://www.marathonbet.com/ru/markets.htm?isHotPrice=false&treeId=#{more_view_id[1]}"
-      @parser.threads << Thread.new(more_url) do |url|
-        puts more_url
-        more_json_doc = JSON.parse open(more_url).read
+      @parser.start_task more_bets_url(more_view_id[1]) do |url|
+        puts url
+        more_json_doc = JSON.parse open(url).read
         more_doc = Nokogiri::HTML(more_json_doc['HTML'])
 
-        @parser.parse_doc_bets more_doc
+        opts = {
+          :doc => more_doc,
+          :leagure => @name,
+          :main_category => "addition"
+        } 
+        Bet.parse opts, &block
       end
     end
 
-    @parser.parse_doc_bets doc
+    opts = {
+      :doc => doc,
+      :leagure => @name,
+      :main_category => "main"
+    } 
+    Bet.parse doc, &block
+  end
+
+  def self.bets_url
+    "http://www.marathonbet.com/#{@href}"
+  end
+
+  def self.more_bets_url(id)
+    "http://www.marathonbet.com/ru/markets.htm?isHotPrice=false&treeId=#{id}"
   end
 
 end

@@ -4,7 +4,7 @@ class Leagure
   def self.parse options, &block
     @parser, @name, @href = options[:parser], options[:name], options[:href]
 
-    doc = Nokogiri::HTML(open(bets_url))
+    doc = Nokogiri::HTML(open(bets_url(@href)))
 
     doc.css('.event-more-view').each do |link|
       more_view_id = /event-more-view-(\d+)/.match(link['id'])
@@ -31,8 +31,8 @@ class Leagure
     Bet.parse doc, &block
   end
 
-  def self.bets_url
-    "http://www.marathonbet.com/#{@href}"
+  def self.bets_url(href)
+    "http://www.marathonbet.com/#{href}"
   end
 
   def self.more_bets_url(id)

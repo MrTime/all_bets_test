@@ -10,7 +10,6 @@ class Leagure
       more_view_id = /event-more-view-(\d+)/.match(link['id'])
 
       @parser.start_task more_bets_url(more_view_id[1]) do |url|
-        puts url
         more_json_doc = JSON.parse open(url).read
         more_doc = Nokogiri::HTML(more_json_doc['HTML'])
 

@@ -7,9 +7,9 @@ describe Bet do
   let(:doc) { Nokogiri::HTML(open('spec/support/bets.html')) }
 
   BET_VALUES = { :event_id => '805371', 
-              :category => 'Match_Result', 
+              :category => 'Match_Result.1', 
               :koeff => 2.0,
-              :bet => '1'}
+              :rel => 'rel'}
 
   it 'should parse all bets' do
     results = []
@@ -17,7 +17,7 @@ describe Bet do
       results << result;
     end
 
-    results.size.should eq 4
+    results.size.should eq 6
   end
 
   BET_VALUES.each_pair do |key,value|
@@ -41,5 +41,16 @@ describe Bet do
     results[1][:value].should eq '-1'
     results[2][:value].should eq '+1'
     results[3][:value].should eq '2.5'
+  end
+
+  it 'should parse period of bet' do
+    results = []
+    Bet.parse(doc) do |result|
+      results << result;
+    end
+
+    results[0][:period].should eq 'Full_Match'
+    results[4][:period].should eq '1st_Half'
+    results[5][:period].should eq '2nd_Half'
   end
 end

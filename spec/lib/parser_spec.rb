@@ -1,3 +1,4 @@
+require File.expand_path(File.dirname(__FILE__) + "/../spec_helper")
 require './lib/parser'
 
 describe Parser do
@@ -24,5 +25,10 @@ describe Parser do
     parser.parse do |bet|
       bet.should eq "new bet"
     end
+  end
+
+  it 'should generate url for getting leagures list' do
+    Parser.any_instance.unstub(:leagures_url)
+    parser.leagures_url.should eq 'http://www.marathonbet.com/ru/tree-node.htm?nodeId=11'
   end
 end

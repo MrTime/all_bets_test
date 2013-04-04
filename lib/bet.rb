@@ -54,7 +54,7 @@ class Bet
   end
 
   def self.get_event id, link
-    if @events[id].nil? or !@events[id][:pending].nil?
+    if @events[id].nil?
 
       event_root = link.parent.parent.parent
       while event_root.name != "tbody"
@@ -63,29 +63,24 @@ class Bet
 
       teams = event_root.css('.member-name, .today-member-name')
 
-      if teams.nil?
-        event = {:pending => true}
+      event_date = DateTime.parse(event_root.css('.date').first.inner_text.strip)
+
+      if teams.nil? or teams.empty?
+        puts "TEAMS is null for event #{id}"
+        event = {:id => id}
       else
-        event_date = DateTime.parse(event_root.css('.date').first.inner_text.strip)
 
-        if teams.nil? or teams.empty?
-          puts "TEAMS is null for event #{id}"
-          event = {:id => id}
-        else
+        event = {
+          :id => id,
+          :home => teams[0].content,
+          :guess => teams[1].content,
+          :leagure => @leagure,
+          :date => event_date.to_date,
+          :time => event_date.strftime("%H:%M")
+        }
 
-          event = {
-            :id => id,
-            :home => teams[0].content,
-            :guess => teams[1].content,
-            :leagure => @leagure,
-            :date => event_date.to_date,
-            :time => event_date.strftime("%H:%M")
-          }
-
-        end
       end
     else
-
       event = @events[id] 
     end
 

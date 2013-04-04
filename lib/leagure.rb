@@ -13,21 +13,20 @@ class Leagure
         more_json_doc = JSON.parse open(url).read
         more_doc = Nokogiri::HTML(more_json_doc['HTML'])
 
-        opts = {
-          :doc => more_doc,
-          :leagure => @name,
-          :main_category => "addition"
-        } 
-        Bet.parse opts, &block
+       Bet.parse bet_options(doc,'addition'), &block
       end
     end
 
+    Bet.parse bet_options(doc,'main'), &block
+  end
+
+  def self.bet_options(doc, category)
     opts = {
       :doc => doc,
       :leagure => @name,
-      :main_category => "main"
-    } 
-    Bet.parse opts, &block
+      :parser => @parser,
+      :main_category => category
+    }
   end
 
   def self.bets_url(href)

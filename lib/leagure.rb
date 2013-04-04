@@ -27,7 +27,7 @@ class Leagure
       :leagure => @name,
       :main_category => "main"
     } 
-    Bet.parse doc, &block
+    Bet.parse opts, &block
   end
 
   def self.bets_url(href)

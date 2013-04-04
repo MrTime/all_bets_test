@@ -1,13 +1,17 @@
+# coding: utf-8
 require File.expand_path(File.dirname(__FILE__) + "/../spec_helper")
 require './lib/leagure'
 
 describe Bet do
 
   let(:parser) { Parser.new :sport_id => 11 }
-  let(:doc) { Nokogiri::HTML(open('spec/support/bets.html')) }
+  let(:doc) do
+    doc = Nokogiri::HTML(open('spec/support/bets.html')) 
+    doc
+  end
   let(:results) do
     results = []
-    Bet.parse(doc) do |result|
+    Bet.parse({:doc => doc, :leagure => "leagure"}) do |result|
       results << result;
     end
     results
@@ -41,7 +45,27 @@ describe Bet do
     results[5][:period].should eq '2nd_Half'
   end
 
-  it 'should parse event home' do
+  it 'should parse event leagure' do
+    results[0][:event][:leagure].should eq "leagure"
+  end
 
+  it 'should parse event home' do
+    results[0][:event][:home].should eq "home"
+  end
+
+  it 'should parse event guess' do
+    results[0][:event][:guess].should eq "guess"
+  end
+
+  it 'should parse event date' do
+    results[0][:event][:date].should eq Date.new(Date.today.year, 4, 6)
+  end
+
+  it 'should parse event time' do
+    results[0][:event][:time].should eq "08:00"
+  end
+
+  it 'should not dublicate event' do
+    results[0][:event].object_id.should eq results[1][:event].object_id
   end
 end

@@ -1,5 +1,9 @@
 class Bet
-  def self.parse doc, &block
+  def self.parse options, &block
+    @events = {}
+    @leagure = options[:leagure]
+    doc = options[:doc]
+
     doc.css('.selection-price').each_with_index do |link,i|
       if i%2 == 0
         params = /(\d+)@(.*)/.match(link['id'])
@@ -18,16 +22,34 @@ class Bet
                    'Full_Match'
                  end
 
+
         options = {
           :event_id => params[1],
           :koeff => koeff,
           :category => category,
           :value => value,
           :period => period,
+          :event => get_event(params[1], link),
           :rel => rel
         }
         yield options
       end
     end
+  end
+
+  def self.get_event id, link
+    return @events[id] unless @events[id].nil?
+
+    event_root = link.parent.parent
+    teams = event_root.css('.member-name')
+    event_date = DateTime.parse(event_root.css('.date').first.inner_text.strip)
+
+    @events[id] = {
+            :home => teams[0].inner_text,
+            :guess => teams[1].content,
+            :leagure => @leagure,
+            :date => event_date.to_date,
+            :time => event_date.strftime("%H:%M")
+          }
   end
 end

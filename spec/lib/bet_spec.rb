@@ -23,7 +23,7 @@ describe Bet do
               :rel => 'rel'}
 
   it 'should parse all bets' do
-    results.size.should eq 6
+    results.size.should eq 7
   end
 
   BET_VALUES.each_pair do |key,value|
@@ -53,8 +53,16 @@ describe Bet do
     results[0][:event][:home].should eq "home"
   end
 
+  it 'should parse event home for today' do
+    results[6][:event][:home].should eq "home"
+  end
+
   it 'should parse event guess' do
     results[0][:event][:guess].should eq "guess"
+  end
+
+  it 'should parse event guess for today' do
+    results[6][:event][:guess].should eq "guess"
   end
 
   it 'should parse event date' do

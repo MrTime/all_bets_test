@@ -61,7 +61,7 @@ class Bet
         event_root = event_root.parent
       end
 
-      teams = event_root.css('.member-name')
+      teams = event_root.css('.member-name, .today-member-name')
 
       if teams.nil?
         event = {:pending => true}

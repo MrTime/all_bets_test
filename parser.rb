@@ -3,7 +3,15 @@ require 'bundler/setup'
 
 require './lib/parser'
 
+events = {}
+start_time = Time.now
+
 parser = Parser.new :sport_id => 11
 parser.parse do |bet|
-  puts "event: #{bet[:event_id]} category: #{bet[:category]} bet: #{bet[:bet]}"
+  events[bet[:event]] = bet
+  bet[:event] = nil
+  print "\r bets processed #{bet[:progress]}"
 end
+
+puts JSON.pretty_generate(events)
+

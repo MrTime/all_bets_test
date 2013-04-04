@@ -6,18 +6,22 @@ class Leagure
 
     doc = Nokogiri::HTML(open(bets_url(@href)))
 
+    Bet.parse bet_options(doc,'main'), &block
     doc.css('.event-more-view').each do |link|
       more_view_id = /event-more-view-(\d+)/.match(link['id'])
 
       @parser.start_task more_bets_url(more_view_id[1]) do |url|
-        more_json_doc = JSON.parse open(url).read
-        more_doc = Nokogiri::HTML(more_json_doc['HTML'])
+        begin
+          more_json_doc = JSON.parse open(url).read
+          more_doc = Nokogiri::HTML(more_json_doc['HTML'])
 
-       Bet.parse bet_options(doc,'addition'), &block
+          Bet.parse bet_options(doc,'addition'), &block
+        rescue Exception => e
+          puts "error occured while loading #{url}"
+        end
       end
     end
 
-    Bet.parse bet_options(doc,'main'), &block
   end
 
   def self.bet_options(doc, category)

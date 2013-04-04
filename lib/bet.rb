@@ -9,7 +9,7 @@ class Bet
     doc = options[:doc]
 
     all_bets = doc.css('.selection-price')
-    @total_bets_count += all_bets.size
+    @total_bets_count += all_bets.size / 2
 
     all_bets.each_with_index do |link,i|
       if i%2 == 0
